@@ -1,0 +1,794 @@
+definitions:
+  database.GetAllResponse-models_Developer:
+    properties:
+      count:
+        type: integer
+      currentPage:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models.Developer'
+        type: array
+      length:
+        type: integer
+      message:
+        type: string
+      totalPage:
+        type: number
+    type: object
+  database.GetAllResponse-models_Project:
+    properties:
+      count:
+        type: integer
+      currentPage:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models.Project'
+        type: array
+      length:
+        type: integer
+      message:
+        type: string
+      totalPage:
+        type: number
+    type: object
+  database.GetAllResponse-models_Request:
+    properties:
+      count:
+        type: integer
+      currentPage:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/models.Request'
+        type: array
+      length:
+        type: integer
+      message:
+        type: string
+      totalPage:
+        type: number
+    type: object
+  database.GetResponse-models_Project:
+    properties:
+      data:
+        $ref: '#/definitions/models.Project'
+      message:
+        type: string
+    type: object
+  database.GetResponse-models_Request:
+    properties:
+      data:
+        $ref: '#/definitions/models.Request'
+      message:
+        type: string
+    type: object
+  database.GetResponse-models_User:
+    properties:
+      data:
+        $ref: '#/definitions/models.User'
+      message:
+        type: string
+    type: object
+  database.Response:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  enums.ProjectStatus:
+    enum:
+    - OPEN
+    - IN_PROGRESS
+    - COMPLETED
+    type: string
+    x-enum-varnames:
+    - OPEN
+    - IN_PROGRESS
+    - COMPLETED
+  enums.RequestStatus:
+    enum:
+    - PENDING
+    - APPROVED
+    - REJECTED
+    type: string
+    x-enum-varnames:
+    - PENDING
+    - APPROVED
+    - REJECTED
+  models.Developer:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      project:
+        $ref: '#/definitions/models.Project'
+      projectId:
+        type: integer
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userId:
+        type: integer
+    type: object
+  models.Project:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      developers:
+        items:
+          $ref: '#/definitions/models.Developer'
+        type: array
+      endDate:
+        $ref: '#/definitions/sql.NullTime'
+      estimatedDuration:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      imageName:
+        type: string
+      name:
+        type: string
+      published:
+        type: boolean
+      startDate:
+        $ref: '#/definitions/sql.NullTime'
+      status:
+        $ref: '#/definitions/enums.ProjectStatus'
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userId:
+        type: integer
+    type: object
+  models.Request:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      project:
+        $ref: '#/definitions/models.Project'
+      projectId:
+        type: integer
+      status:
+        $ref: '#/definitions/enums.RequestStatus'
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userId:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      bio:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      imageName:
+        type: string
+      name:
+        type: string
+      projects:
+        items:
+          $ref: '#/definitions/models.Project'
+        type: array
+      provider:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - provider
+    type: object
+  sql.NullTime:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  user.Login.Response:
+    properties:
+      data:
+        properties:
+          token:
+            type: string
+        type: object
+      message:
+        type: string
+    type: object
+  user.Register.Response:
+    properties:
+      data:
+        properties:
+          token:
+            type: string
+        type: object
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetResponse-models_User'
+      security:
+      - Bearer: []
+      summary: Get auth profile
+      tags:
+      - Auth
+    patch:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        type: string
+      - description: Description
+        in: formData
+        name: bio
+        type: string
+      - description: File to upload
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Update profile
+      tags:
+      - Auth
+  /auth/project:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        type: integer
+      - description: Status
+        enum:
+        - OPEN
+        - IN_PROGRESS
+        - COMPLETED
+        in: query
+        name: status
+        type: string
+      - description: Published
+        in: query
+        name: published
+        type: boolean
+      - description: Sort
+        enum:
+        - id
+        - created_at
+        - name
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetAllResponse-models_Project'
+      security:
+      - Bearer: []
+      summary: Get all projects
+      tags:
+      - Auth
+  /project:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        type: integer
+      - description: Sort
+        enum:
+        - id
+        - created_at
+        - name
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetAllResponse-models_Project'
+      summary: Get all projects
+      tags:
+      - Project
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Published
+        in: formData
+        name: published
+        type: boolean
+      - description: Estimated Duration
+        in: formData
+        name: estimatedDuration
+        required: true
+        type: integer
+      - description: File to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Create a project
+      tags:
+      - Project
+  /project/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetResponse-models_Project'
+      summary: Get a project
+      tags:
+      - Project
+    patch:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Name
+        in: formData
+        name: name
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: Estimated Duration
+        in: formData
+        name: estimatedDuration
+        type: integer
+      - description: File to upload
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Update project
+      tags:
+      - Project
+  /project/{id}/developer:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Sort
+        enum:
+        - id
+        - created_at
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetAllResponse-models_Developer'
+      summary: Get project developers
+      tags:
+      - Project
+  /project/{id}/publish:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Unpublish project
+      tags:
+      - Project
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Publish project
+      tags:
+      - Project
+  /project/{id}/request:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        type: integer
+      - description: Status
+        enum:
+        - PENDING
+        - APPROVED
+        - REJECTED
+        in: query
+        name: status
+        type: string
+      - description: Sort
+        enum:
+        - id
+        - created_at
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetAllResponse-models_Request'
+      summary: Get project requests
+      tags:
+      - Project
+  /request/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Delete request
+      tags:
+      - Request
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetResponse-models_Request'
+      summary: Get a request
+      tags:
+      - Request
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Create request
+      tags:
+      - Request
+  /request/{id}/approve:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Reject request
+      tags:
+      - Request
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/database.Response'
+      security:
+      - Bearer: []
+      summary: Approve request
+      tags:
+      - Request
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetResponse-models_User'
+      summary: Get a user
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.Login.Response'
+      summary: Login User
+      tags:
+      - User
+  /user/register:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        minLength: 8
+        name: password
+        required: true
+        type: string
+      - description: Confirm Password
+        in: formData
+        minLength: 8
+        name: confirmPassword
+        required: true
+        type: string
+      - description: File to upload
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.Register.Response'
+      summary: Create an account
+      tags:
+      - User
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
