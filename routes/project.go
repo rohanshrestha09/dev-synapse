@@ -15,15 +15,15 @@ func projectRouter(router *gin.RouterGroup) {
 	{
 		projectGroup.GET("/", project.Get)
 
-		projectGroup.Use(middleware.Auth())
-
-		projectGroup.GET("/request", project.GetRequests)
-
 		projectGroup.GET("/developer", project.GetDevelopers)
 
-		authorizedProject := projectGroup.Group("/", authorize.Project())
+		authorizedProject := projectGroup.Group("/", middleware.Auth(), authorize.Project())
 		{
+			authorizedProject.GET("/request", project.GetRequests)
+
 			authorizedProject.PATCH("/", project.Update)
+
+			authorizedProject.PATCH("/status", project.UpdateStatus)
 
 			authorizedProject.POST("/publish", project.Publish)
 

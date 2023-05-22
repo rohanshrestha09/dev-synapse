@@ -22,8 +22,6 @@ func init() {
 //	@in							header
 //	@name						Authorization
 
-var Router *gin.Engine
-
 func main() {
 	server := gin.Default()
 

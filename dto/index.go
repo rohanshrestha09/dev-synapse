@@ -27,12 +27,12 @@ type ProjectCreateDTO struct {
 	Description       string                `form:"description" binding:"required"`
 	Published         bool                  `form:"published"`
 	Image             *multipart.FileHeader `form:"image" binding:"required"`
-	EstimatedDuration int                   `form:"estimatedDuration" binding:"required"`
+	EstimatedDuration uint                  `form:"estimatedDuration" binding:"required"`
 }
 
 type ProjectUpdateDTO struct {
 	Name              string                `form:"name"`
 	Description       string                `form:"description"`
 	Image             *multipart.FileHeader `form:"image"`
-	EstimatedDuration int                   `form:"estimatedDuration"`
+	EstimatedDuration uint                  `form:"estimatedDuration"`
 }

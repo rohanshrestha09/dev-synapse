@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rohanshrestha09/dev-synapse/enums"
 	"github.com/rohanshrestha09/dev-synapse/models"
 	"github.com/rohanshrestha09/dev-synapse/service/database"
 )
@@ -81,6 +82,11 @@ func Create(ctx *gin.Context) {
 //	@Security	Bearer
 func Delete(ctx *gin.Context) {
 	request := ctx.MustGet("request").(models.Request)
+
+	if request.Status == enums.APPROVED {
+		ctx.JSON(http.StatusBadRequest, database.Response{Message: "cannot delete approved request"})
+		return
+	}
 
 	response, err := database.Delete(request)
 

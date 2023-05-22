@@ -80,7 +80,6 @@ func GetAll[T any](bindQuery func(any) error, args GetAllArgs[T]) (GetAllRespons
 
 	if args.Pagination {
 		dbScopes = append(dbScopes, scopes.Paginate(query.Page, query.Size))
-
 	}
 
 	if args.Search {

@@ -333,6 +333,51 @@ paths:
       summary: Get all projects
       tags:
       - Auth
+  /auth/request:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: size
+        type: integer
+      - description: Status
+        enum:
+        - PENDING
+        - APPROVED
+        - REJECTED
+        in: query
+        name: status
+        type: string
+      - description: Sort
+        enum:
+        - id
+        - created_at
+        in: query
+        name: sort
+        type: string
+      - description: Order
+        enum:
+        - asc
+        - desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/database.GetAllResponse-models_Request'
+      summary: Get auth requests
+      tags:
+      - Auth
   /project:
     get:
       consumes:

@@ -1,4 +1,4 @@
-package project
+package auth
 
 import (
 	"net/http"
@@ -11,21 +11,20 @@ import (
 
 // Get Requests godoc
 //
-//	@Summary	Get project requests
-//	@Tags		Project
+//	@Summary	Get auth requests
+//	@Tags		Auth
 //	@Accept		json
 //	@Produce	json
-//	@Param		id		path		int		true	"Project ID"
 //	@Param		page	query		int		false	"Page"
 //	@Param		size	query		int		false	"Page size"
 //	@Param		status	query		string	false	"Status"	Enums(PENDING, APPROVED, REJECTED)
 //	@Param		sort	query		string	false	"Sort"		Enums(id, created_at)
 //	@Param		order	query		string	false	"Order"		Enums(asc, desc)
 //	@Success	200		{object}	database.GetAllResponse[models.Request]
-//	@Router		/project/{id}/request [get]
+//	@Router		/auth/request [get]
 func GetRequests(ctx *gin.Context) {
 
-	project := ctx.MustGet("project").(models.Project)
+	authUser := ctx.MustGet("auth").(models.User)
 
 	var query struct {
 		Status enums.RequestStatus `form:"status"`
@@ -39,12 +38,11 @@ func GetRequests(ctx *gin.Context) {
 	args := database.GetAllArgs[models.Request]{
 		Pagination: true,
 		Include: map[string][]string{
-			"User":    {"Email"},
 			"Project": {},
 		},
 		Filter: models.Request{
-			ProjectID: project.ID,
-			Status:    query.Status,
+			UserID: authUser.ID,
+			Status: query.Status,
 		},
 	}
 

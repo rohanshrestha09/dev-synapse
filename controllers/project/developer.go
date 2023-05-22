@@ -14,7 +14,7 @@ import (
 //	@Tags		Project
 //	@Accept		json
 //	@Produce	json
-//	@Param		id	path		int	true	"Project ID"
+//	@Param		id		path		int		true	"Project ID"
 //	@Param		sort	query		string	false	"Sort"	Enums(id, created_at)
 //	@Param		order	query		string	false	"Order"	Enums(asc, desc)
 //	@Success	200		{object}	database.GetAllResponse[models.Developer]
